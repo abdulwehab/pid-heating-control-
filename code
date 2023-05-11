@@ -1,0 +1,29 @@
+import time
+import board
+import busio
+import adafruit_max31865
+import PID
+
+# Initialize the SPI bus
+spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+
+# Initialize the MAX31865 RTD amplifier
+rtd = adafruit_max31865.MAX31865(spi, cs, wires=wires)
+
+# Initialize the PID controller
+pid = PID.PID(kp=1.0, ki=0.1, kd=0.05, setpoint=100)
+pid.setSampleTime(1)
+
+# Loop to read and control temperature
+while True:
+    # Read the temperature
+    temperature = rtd.temperature
+
+    # Compute the control signal using PID
+    control_signal = pid.update(temperature)
+
+    # Apply the control signal to the heating element
+    apply_control_signal(control_signal)
+
+    # Wait for 1 second
+    time.sleep(1)
